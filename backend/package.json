@@ -1,0 +1,15 @@
+{
+  "name": "requests-form",
+  "version": "0.0.1",
+  "description": "API handlers for song requests",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ben Ockert",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "serverless-http": "^3.1.1"
+  }
+}

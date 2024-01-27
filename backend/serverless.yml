@@ -1,0 +1,76 @@
+service: requests-form-backend
+frameworkVersion: "3"
+
+custom:
+  deploymentBucketName: "serverless-deployment-fghjkl389xc7a"
+  tableName: "song-requests-form-submission-${sls:stage}"
+  stackName: "song-requests-backend-stack-${sls:stage}"
+  eventName: "Bentley_Gala_2024"
+
+provider:
+  name: aws
+  stage: dev
+  region: us-west-2
+  stackName: ${self:custom.stackName}
+  runtime: nodejs18.x
+  deploymentPrefix: song-requests
+  deploymentBucket:
+    name: ${self:custom.deploymentBucketName}
+    maxPreviousDeploymentArtifacts: 10
+    versioning: true
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:BatchGetItem
+            - dynamodb:BatchWriteItem
+            - dynamodb:ConditionCheckItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [RequestsTable, Arn]
+  environment:
+    REQUESTS_TABLE: ${self:custom.tableName}
+    EVENT_NAME: ${self:custom.eventName}
+  httpApi:
+    cors:
+      allowedOrigins: # TODO: eventually change
+        - "*"
+      allowedHeaders:
+        - "*"
+      allowedMethods: # TODO: eventually restrict to GET, POST
+        - "*"
+      maxAge: 3600
+
+functions:
+  handleRequests:
+    memorySize: 512
+    timeout: 10
+    name: song-requests-form-handler-${sls:stage}
+    description: "Handler for requests submissions for Bentley"
+    handler: index.handler
+    events:
+      - httpApi: "*"
+
+resources:
+  Resources:
+    RequestsTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: event_name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: event_name
+            KeyType: HASH
+        TableName: ${self:custom.tableName}
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
