@@ -140,7 +140,7 @@ app.post("/requests/:eventId", async function (req, res) {
       await dynamoDbClient.send(new PutCommand(params));
       res.status(200).json({
         severity: "success",
-        title: "Success",
+        title: "Request submitted",
         message: `Thank you for your request${
           requestorName == "" ? ":" : `, ${requestorName.split(" ")[0]}!`
         } ${songTitle} by ${artistName}`,

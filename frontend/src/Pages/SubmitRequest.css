@@ -1,11 +1,14 @@
-.submit-request-stack {
-    text-align: center;
+.container {
     background-color: #000;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+
+.submit-request {
+    text-align: center;
     font-size: calc(18px + 2vmin);
     color: white;
 }
@@ -17,10 +20,13 @@
 
 .event-date {
     font-size: calc(.6 * (18px + 2vmin));
-    margin-top: -20px; /* todo */
+    margin-top: -20px;
+    /* todo */
 }
 
 .css-wnkddu-MuiPaper-root-MuiAlert-root {
-    /* width: 80%; */
-    z-index: 100;
+    width: clamp(50%, 80%, 700px);
+    position: absolute;
+    left: 10px;
+    top: 10px;
 }

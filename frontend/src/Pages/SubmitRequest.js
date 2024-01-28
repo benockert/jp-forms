@@ -15,7 +15,11 @@ export async function requestsPageLoader({ request }) {
 }
 
 function SubmitRequest() {
-  const [alert, setAlert] = useState();
+  const [alert, setAlert] = useState({
+    severity: "success",
+    title: "Request submitted",
+    message: "Thank you for your request: Another One Bites The Dust by Queen",
+  });
   const { eventId } = useParams();
   const eventInfo = useLoaderData();
 
@@ -26,36 +30,36 @@ function SubmitRequest() {
       artistName,
       requestorName,
     }).then((data) => {
-      // response
-      console.log(data);
       setAlert(data);
+
+      // todo: if status 200, increment 1 request in local cookie storage
     });
   };
 
   // alert banner handling
-  useEffect(() => {
-    if (alert) {
-      const timeout = setTimeout(() => {
-        setAlert();
-      }, alertDuration);
+  //   useEffect(() => {
+  //     if (alert) {
+  //       const timeout = setTimeout(() => {
+  //         setAlert();
+  //       }, alertDuration);
 
-      return () => {
-        clearTimeout(timeout);
-      };
-    }
-  }, [alert]);
+  //       return () => {
+  //         clearTimeout(timeout);
+  //       };
+  //     }
+  //   }, [alert]);
 
   return (
-    <>
+    <div className="container">
       {alert && (
         <div>
-          <Alert severity={alert.severity}>
+          <Alert severity={alert.severity} onClose={() => setAlert()}>
             <AlertTitle>{alert.title}</AlertTitle>
             {alert.message}
           </Alert>
         </div>
       )}
-      <div className="submit-request-stack">
+      <div className="submit-request">
         <img
           src={"/request_a_song.jpg"}
           className="request-a-song-image"
@@ -67,7 +71,7 @@ function SubmitRequest() {
         </div>
         <Form OnSubmit={SubmitForm} />
       </div>
-    </>
+    </div>
   );
 }
 
