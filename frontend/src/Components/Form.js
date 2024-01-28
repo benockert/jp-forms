@@ -41,8 +41,9 @@ export const Form = ({ OnSubmit }) => {
       song: "",
       artist: "",
     },
-    onSubmit: (values) => {
+    onSubmit: (values, { resetForm }) => {
       OnSubmit(values);
+      resetForm();
     },
   });
 
