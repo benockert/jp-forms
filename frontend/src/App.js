@@ -1,29 +1,17 @@
-import "./App.css";
-import { Form } from "./Components/Form";
-import { postData } from "./api";
-
-const SubmitForm = (values) => {
-  const { song: songTitle, artist: artistName, name: requestorName } = values;
-  postData({ songTitle, artistName, requestorName }).then((data) => {
-    // response
-    console.log(data);
-  });
-};
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Home from "./Pages/Home";
+import SubmitRequest, { requestsPageLoader } from "./Pages/SubmitRequest";
 
 function App() {
-  return (
-    <div className="App">
-      <img
-        src={"/request_a_song.jpg"}
-        className="request-a-song"
-        alt="song-request-form-header-image"
-      />
-      <div>
-        <p>Event Name</p>
-      </div>
-      <Form OnSubmit={SubmitForm} />
-    </div>
-  );
+  const router = createBrowserRouter([
+    {
+      path: ":eventId",
+      element: <SubmitRequest />,
+      loader: requestsPageLoader,
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
 }
 
 export default App;

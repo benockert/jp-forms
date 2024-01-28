@@ -1,0 +1,21 @@
+.submit-request-stack {
+    text-align: center;
+    background-color: #000;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(18px + 2vmin);
+    color: white;
+}
+
+.request-a-song-image {
+    width: clamp(250px, 90%, 600px);
+    pointer-events: none;
+}
+
+.event-date {
+    font-size: calc(.6 * (18px + 2vmin));
+    margin-top: -20px; /* todo */
+}
