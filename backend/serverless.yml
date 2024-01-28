@@ -3,7 +3,7 @@ frameworkVersion: "3"
 
 custom:
   deploymentBucketName: "serverless-deployment-fghjkl389xc7a"
-  tableName: "song-requests-form-submission-${sls:stage}"
+  requestsTableName: "song-requests-form-submission-${sls:stage}"
   stackName: "song-requests-backend-stack-${sls:stage}"
   eventName: "Bentley_Gala_2024"
 
@@ -35,24 +35,17 @@ provider:
           Resource:
             - Fn::GetAtt: [RequestsTable, Arn]
   environment:
-    REQUESTS_TABLE: ${self:custom.tableName}
+    REQUESTS_TABLE: ${self:custom.requestsTableName}
     EVENT_NAME: ${self:custom.eventName}
   httpApi:
-    cors:
-      allowedOrigins: # TODO: eventually change
-        - "*"
-      allowedHeaders:
-        - "*"
-      allowedMethods: # TODO: eventually restrict to GET, POST
-        - "*"
-      maxAge: 3600
+    cors: true
 
 functions:
   handleRequests:
     memorySize: 512
     timeout: 10
     name: song-requests-form-handler-${sls:stage}
-    description: "Handler for requests submissions for Bentley"
+    description: "Handler for song request form submissions"
     handler: index.handler
     events:
       - httpApi: "*"
@@ -73,7 +66,7 @@ resources:
             KeyType: HASH
           - AttributeName: submission_timestamp
             KeyType: RANGE
-        TableName: ${self:custom.tableName}
+        TableName: ${self:custom.requestsTableName}
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1

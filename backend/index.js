@@ -14,6 +14,7 @@ const client = new DynamoDBClient();
 const dynamoDbClient = DynamoDBDocumentClient.from(client);
 
 app.use(express.json());
+app.use(express.urlencoded()); // needed to handle form-data submissions
 
 app.get("/requests", async function (req, res) {
   const params = {
@@ -42,6 +43,9 @@ app.get("/requests", async function (req, res) {
 });
 
 app.post("/requests", async function (req, res) {
+  const body = req.body;
+  console.log({ body });
+
   const { songTitle, artistName, requestorName } = req.body;
   if (typeof songTitle !== "string") {
     res.status(400).json({ error: '"songTitle" must be a string' });
@@ -49,30 +53,30 @@ app.post("/requests", async function (req, res) {
     res.status(400).json({ error: '"artistName" must be a string' });
   } else if (typeof requestorName !== "string") {
     res.status(400).json({ error: '"requestorName" must be a string' });
-  }
+  } else {
+    const params = {
+      TableName: REQUESTS_TABLE,
+      Item: {
+        event_name: process.env.EVENT_NAME,
+        submission_timestamp: Date.now(),
+        song_title: songTitle ?? "",
+        artist_name: artistName ?? "",
+        requestor_name: requestorName ?? "",
+      },
+    };
 
-  const params = {
-    TableName: REQUESTS_TABLE,
-    Item: {
-      event_name: process.env.EVENT_NAME,
-      submission_timestamp: Date.now(),
-      song_title: songTitle ?? "",
-      artist_name: artistName ?? "",
-      requestor_name: requestorName ?? "",
-    },
-  };
-
-  try {
-    console.log("Submitting Put request: ", params);
-    await dynamoDbClient.send(new PutCommand(params));
-    res.json({
-      message: `Thank you for your submission${
-        requestorName == "" ? ":" : `, ${requestorName}:`
-      } ${songTitle} by ${artistName}`,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Could not submit request" });
+    try {
+      console.log("Submitting Put request: ", params);
+      await dynamoDbClient.send(new PutCommand(params));
+      res.json({
+        message: `Thank you for your submission${
+          requestorName == "" ? ":" : `, ${requestorName}:`
+        } ${songTitle} by ${artistName}`,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "Could not submit request" });
+    }
   }
 });
 
