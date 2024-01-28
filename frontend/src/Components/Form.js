@@ -5,9 +5,6 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import Chip from "@mui/material/Chip";
-import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
-import PlaylistRemoveIcon from "@mui/icons-material/PlaylistRemove";
 import "./Form.css";
 
 const formValidationSchema = yup.object({
@@ -36,7 +33,7 @@ const darkTheme = createTheme({
   },
 });
 
-export const Form = ({ OnSubmit, message, formDisabled }) => {
+export const Form = ({ children, OnSubmit, formDisabled }) => {
   const formik = useFormik({
     validationSchema: formValidationSchema,
     initialValues: {
@@ -50,9 +47,17 @@ export const Form = ({ OnSubmit, message, formDisabled }) => {
     },
   });
 
+  console.log({ children });
+
   return (
     <ThemeProvider theme={darkTheme}>
-      <Box sx={{ display: "flex", alignContent: "left", flexWrap: "wrap" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignContent: "left",
+          flexWrap: "wrap",
+        }}
+      >
         <div className="requests-form">
           <form onSubmit={formik.handleSubmit}>
             <TextField
@@ -104,26 +109,7 @@ export const Form = ({ OnSubmit, message, formDisabled }) => {
               Submit
             </Button>
           </form>
-          {/* todo add children props to decouple from parent */}
-          {message.message && (
-            <div className="form-message">
-              {message.result === "success" ? (
-                <Chip
-                  icon={<PlaylistAddCheckIcon />}
-                  label={message.message}
-                  color="success"
-                  variant="outlined"
-                />
-              ) : (
-                <Chip
-                  icon={<PlaylistRemoveIcon />}
-                  label={message.message}
-                  color="warning"
-                  variant="outlined"
-                />
-              )}
-            </div>
-          )}
+          {!!children && <div>{children}</div>}
         </div>
       </Box>
     </ThemeProvider>

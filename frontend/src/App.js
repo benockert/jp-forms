@@ -1,12 +1,12 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import SubmitRequest, { requestsPageLoader } from "./Pages/SubmitRequest";
+import RequestASong, { requestASongPageLoader } from "./Pages/RequestASong";
 
 function App() {
   const router = createBrowserRouter([
     {
       path: "/:eventId",
-      element: <SubmitRequest />,
-      loader: requestsPageLoader,
+      element: <RequestASong />,
+      loader: requestASongPageLoader,
     },
   ]);
 
