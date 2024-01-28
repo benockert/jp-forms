@@ -24,7 +24,7 @@ app.get("/events/:eventId", async function (req, res) {
       const params = {
         TableName: process.env.EVENTS_TABLE,
         Key: {
-          event_id: eventId,
+          event_id: eventId.toLowerCase();,
         },
       };
 
@@ -63,7 +63,7 @@ app.get("/requests/:eventId", async function (req, res) {
           "#ap1": "requestor_name",
           "#ap2": "song_title",
         },
-        ExpressionAttributeValues: { ":v0": eventId },
+        ExpressionAttributeValues: { ":v0": eventId.toLowerCase() },
         Select: "SPECIFIC_ATTRIBUTES",
         ProjectionExpression: "#ap0,#ap1,#ap2",
       };
@@ -94,7 +94,7 @@ app.post("/requests/:eventId", async function (req, res) {
       const params = {
         TableName: process.env.REQUESTS_TABLE,
         Item: {
-          event_name: eventId,
+          event_name: eventId.toLowerCase();,
           submission_timestamp: Date.now(),
           song_title: songTitle ?? "",
           artist_name: artistName ?? "",
