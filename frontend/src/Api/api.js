@@ -1,7 +1,6 @@
 const API_URL = "https://yozv3qlx9a.execute-api.us-west-2.amazonaws.com/";
 
 export async function postData(path, data = {}) {
-  console.log({ data });
   const response = await fetch(`${API_URL}${path}`, {
     method: "POST",
     headers: {

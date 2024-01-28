@@ -5,6 +5,9 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
+import PlaylistRemoveIcon from "@mui/icons-material/PlaylistRemove";
 import "./Form.css";
 
 const formValidationSchema = yup.object({
@@ -33,7 +36,7 @@ const darkTheme = createTheme({
   },
 });
 
-export const Form = ({ OnSubmit }) => {
+export const Form = ({ OnSubmit, message, formDisabled }) => {
   const formik = useFormik({
     validationSchema: formValidationSchema,
     initialValues: {
@@ -49,7 +52,7 @@ export const Form = ({ OnSubmit }) => {
 
   return (
     <ThemeProvider theme={darkTheme}>
-      <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+      <Box sx={{ display: "flex", alignContent: "left", flexWrap: "wrap" }}>
         <div className="requests-form">
           <form onSubmit={formik.handleSubmit}>
             <TextField
@@ -58,6 +61,7 @@ export const Form = ({ OnSubmit }) => {
               id="form-song-title"
               name="song"
               label="Song title"
+              disabled={formDisabled}
               value={formik.values.song}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -70,6 +74,7 @@ export const Form = ({ OnSubmit }) => {
               id="form-song-artist"
               name="artist"
               label="Artist name"
+              disabled={formDisabled}
               value={formik.values.artist}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -82,16 +87,43 @@ export const Form = ({ OnSubmit }) => {
               id="form-name"
               name="name"
               label="Your name (optional)"
+              disabled={formDisabled}
               value={formik.values.name}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               error={formik.touched.name && Boolean(formik.errors.name)}
               helperText={formik.touched.name && formik.errors.name}
             />
-            <Button color="primary" variant="contained" fullWidth type="submit">
+            <Button
+              color="primary"
+              variant="contained"
+              fullWidth
+              type="submit"
+              disabled={formDisabled}
+            >
               Submit
             </Button>
           </form>
+          {/* todo add children props to decouple from parent */}
+          {message.message && (
+            <div className="form-message">
+              {message.result == "success" ? (
+                <Chip
+                  icon={<PlaylistAddCheckIcon />}
+                  label={message.message}
+                  color="success"
+                  variant="outlined"
+                />
+              ) : (
+                <Chip
+                  icon={<PlaylistRemoveIcon />}
+                  label={message.message}
+                  color="warning"
+                  variant="outlined"
+                />
+              )}
+            </div>
+          )}
         </div>
       </Box>
     </ThemeProvider>

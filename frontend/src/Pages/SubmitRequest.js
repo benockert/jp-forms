@@ -4,10 +4,6 @@ import { useLoaderData } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { Form } from "../Components/Form";
 import { postData, getData } from "../Api/api";
-import AlertTitle from "@mui/material/AlertTitle";
-import Alert from "@mui/material/Alert";
-
-const alertDuration = 5 * 1000;
 
 export async function requestsPageLoader({ request }) {
   const eventId = new URL(request.url).pathname.substring(1);
@@ -15,62 +11,71 @@ export async function requestsPageLoader({ request }) {
 }
 
 function SubmitRequest() {
-  const [alert, setAlert] = useState({
-    severity: "success",
-    title: "Request submitted",
-    message: "Thank you for your request: Another One Bites The Dust by Queen",
-  });
   const { eventId } = useParams();
   const eventInfo = useLoaderData();
+  const [formMessage, setFormMessage] = useState({});
+  const [formDisabled, setFormDisabled] = useState(true);
+  const [requestCount, setRequestCount] = useState(() => {
+    // load request count from local storage
+    const count =
+      parseInt(
+        localStorage.getItem(`jamin-productions-requests-form-${eventId}-count`)
+      ) || 0;
+
+    // compare to limit
+    if (count >= eventInfo.requestLimit) {
+      setFormDisabled(true);
+      setFormMessage({ message: "Sorry, the request limit has been reached." });
+    } else {
+      setFormDisabled(false);
+    }
+
+    return count;
+  });
 
   const SubmitForm = (values) => {
+    setFormMessage({});
+
     const { song: songTitle, artist: artistName, name: requestorName } = values;
     postData(`requests/${eventId}`, {
       songTitle,
       artistName,
       requestorName,
     }).then((data) => {
-      setAlert(data);
+      setFormMessage(data);
 
-      // todo: if status 200, increment 1 request in local cookie storage
+      if (data.result == "success") {
+        const count = requestCount + 1;
+        setRequestCount(count);
+        localStorage.setItem(
+          `jamin-productions-requests-form-${eventId}-count`,
+          count
+        );
+
+        // disable the form if we have reached our limit
+        if (count >= eventInfo.requestLimit) {
+          setFormDisabled(true);
+        }
+      }
     });
   };
 
-  // alert banner handling
-  //   useEffect(() => {
-  //     if (alert) {
-  //       const timeout = setTimeout(() => {
-  //         setAlert();
-  //       }, alertDuration);
-
-  //       return () => {
-  //         clearTimeout(timeout);
-  //       };
-  //     }
-  //   }, [alert]);
-
   return (
     <div className="container">
-      {alert && (
-        <div>
-          <Alert severity={alert.severity} onClose={() => setAlert()}>
-            <AlertTitle>{alert.title}</AlertTitle>
-            {alert.message}
-          </Alert>
-        </div>
-      )}
-      <div className="submit-request">
-        <img
-          src={"/request_a_song.jpg"}
-          className="request-a-song-image"
-          alt="Song Request Form Header Image"
-        />
-        <div>
-          <p className="event-name">{eventInfo.name}</p>
-          <p className="event-date">{eventInfo.date}</p>
-        </div>
-        <Form OnSubmit={SubmitForm} />
+      <img
+        src={"/request_a_song.jpg"}
+        className="request-a-song-image"
+        alt="Song Request Form Header Image"
+      />
+      <div>
+        <p className="event-name">{eventInfo.name}</p>
+        <p className="event-date">{eventInfo.date}</p>
       </div>
+      <Form
+        OnSubmit={SubmitForm}
+        message={formMessage}
+        formDisabled={formDisabled}
+      />
     </div>
   );
 }

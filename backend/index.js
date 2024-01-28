@@ -20,8 +20,7 @@ app.get("/events/:eventId", async function (req, res) {
     const eventId = req.params.eventId;
     if (!eventId) {
       res.status(404).json({
-        severity: "error",
-        title: "404",
+        result: "error",
         message: "Event not found",
       });
     } else {
@@ -34,12 +33,16 @@ app.get("/events/:eventId", async function (req, res) {
 
       const { Item } = await dynamoDbClient.send(new GetCommand(params));
       if (Item) {
-        const { event_id: eventId, name, date } = Item;
-        res.json({ eventId, name, date });
+        const {
+          event_id: eventId,
+          name,
+          date,
+          request_limit: requestLimit,
+        } = Item;
+        res.json({ eventId, name, date, requestLimit });
       } else {
         res.status(404).json({
-          severity: "error",
-          title: "404",
+          result: "error",
           message: `Could not find event with id ${eventId}`,
         });
       }
@@ -47,23 +50,19 @@ app.get("/events/:eventId", async function (req, res) {
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      severity: "error",
-      title: "Error",
+      result: "error",
       message: "Could not retreive event information",
     });
   }
 });
 
-// https://requests.jaminproductions.com/api/v1/requests/BentleyGala2024
-// https://requests.jaminproductions.com/BentleyGala2024
 app.get("/requests/:eventId", async function (req, res) {
   try {
     const eventId = req.params.eventId;
 
     if (!eventId) {
       res.status(404).json({
-        severity: "error",
-        title: "404",
+        result: "error",
         message: "Event not found",
       });
     } else {
@@ -89,8 +88,7 @@ app.get("/requests/:eventId", async function (req, res) {
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      severity: "error",
-      title: "Error",
+      result: "error",
       message: "Could not retrieve requests",
     });
   }
@@ -102,26 +100,22 @@ app.post("/requests/:eventId", async function (req, res) {
     const { songTitle, artistName, requestorName, eventName } = req.body;
     if (!eventId) {
       res.status(404).json({
-        severity: "error",
-        title: "404",
+        result: "error",
         message: "Event not found",
       });
     } else if (typeof songTitle !== "string") {
       res.status(400).json({
-        severity: "error",
-        title: "404",
+        result: "error",
         message: '"songTitle" must be a string',
       });
     } else if (typeof artistName !== "string") {
       res.status(400).json({
-        severity: "error",
-        title: "404",
+        result: "error",
         message: '"artistName" must be a string',
       });
     } else if (typeof requestorName !== "string") {
       res.status(400).json({
-        severity: "error",
-        title: "404",
+        result: "error",
         message: '"requestorName" must be a string',
       });
     } else {
@@ -139,18 +133,16 @@ app.post("/requests/:eventId", async function (req, res) {
       console.log("Submitting Put request: ", params);
       await dynamoDbClient.send(new PutCommand(params));
       res.status(200).json({
-        severity: "success",
-        title: "Request submitted",
+        result: "success",
         message: `Thank you for your request${
-          requestorName == "" ? ":" : `, ${requestorName.split(" ")[0]}!`
-        } ${songTitle} by ${artistName}`,
+          requestorName == "" ? "!" : `, ${requestorName.split(" ")[0]}!`
+        }`,
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      severity: "error",
-      title: "Error",
+      result: "error",
       message: "Could not submit song request",
     });
   }
@@ -158,8 +150,7 @@ app.post("/requests/:eventId", async function (req, res) {
 
 app.use((req, res, next) => {
   return res.status(404).json({
-    severity: "error",
-    title: "404",
+    result: "error",
     message: "Path not found",
   });
 });
