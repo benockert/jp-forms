@@ -107,7 +107,7 @@ export const Form = ({ OnSubmit, message, formDisabled }) => {
           {/* todo add children props to decouple from parent */}
           {message.message && (
             <div className="form-message">
-              {message.result == "success" ? (
+              {message.result === "success" ? (
                 <Chip
                   icon={<PlaylistAddCheckIcon />}
                   label={message.message}

@@ -15,7 +15,6 @@
     font-size: 14px;
 }
 
-/* remove the outline from success, warning, and error Chips */
-.css-p5fxfl-MuiChip-root, .css-1pchhoq-MuiChip-root, .css-5rou4r-MuiChip-root {
+.MuiChip-outlinedWarning, .MuiChip-outlinedError, .MuiChip-outlinedSuccess {
     border: none !important;
 }

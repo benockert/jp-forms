@@ -1,5 +1,5 @@
 import "./SubmitRequest.css";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { Form } from "../Components/Form";
@@ -44,7 +44,7 @@ function SubmitRequest() {
     }).then((data) => {
       setFormMessage(data);
 
-      if (data.result == "success") {
+      if (data.result === "success") {
         const count = requestCount + 1;
         setRequestCount(count);
         localStorage.setItem(
@@ -65,7 +65,7 @@ function SubmitRequest() {
       <img
         src={"/request_a_song.jpg"}
         className="request-a-song-image"
-        alt="Song Request Form Header Image"
+        alt="Request a song"
       />
       <div>
         <p className="event-name">{eventInfo.name}</p>
