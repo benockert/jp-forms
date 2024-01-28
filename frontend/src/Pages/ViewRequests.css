@@ -4,17 +4,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     text-align: center;
     font-size: calc(18px + 2vmin);
     color: white;
 }
 
-.request-a-song-image {
+.requests-view {
     width: clamp(250px, 90%, 600px);
-    pointer-events: none;
-}
-
-.form-component {
-    margin-top: 1em;
+    margin-top: 0.5em;
 }

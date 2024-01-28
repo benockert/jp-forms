@@ -1,16 +1,18 @@
-import "./RequestASong.css";
 import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { Form } from "../Components/Form";
+import Header from "../Components/Header";
 import { postData, getData } from "../api/api";
 import Chip from "@mui/material/Chip";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import PlaylistRemoveIcon from "@mui/icons-material/PlaylistRemove";
 import Box from "@mui/material/Box";
 
+import "./RequestASong.css";
+
 export async function requestASongPageLoader({ request }) {
-  const eventId = new URL(request.url).pathname.substring(1);
+  const eventId = new URL(request.url).pathname.split("/")[1];
   return getData(`events/${eventId}`);
 }
 
@@ -70,48 +72,42 @@ function RequestASong() {
 
   return (
     <div className="container">
-      <img
-        src={"/images/request_a_song.jpg"}
-        className="request-a-song-image"
-        alt="Request a song"
-      />
-      <div>
-        <p className="event-name">{eventInfo.name}</p>
-        <p className="event-date">{eventInfo.date}</p>
-      </div>
-      <Form OnSubmit={SubmitForm} formDisabled={formDisabled}>
-        {formMessage.message && (
-          <Box
-            className="form-message"
-            sx={{
-              "& .MuiChip-outlined": {
-                border: "none",
-              },
-            }}
-          >
-            {formMessage.result === "success" ? (
-              <Chip
-                icon={<PlaylistAddCheckIcon />}
-                label={formMessage.message}
-                color="success"
-                variant="outlined"
-                sx={{
-                  "& MuiChip-outlined": {
-                    border: "none",
-                  },
-                }}
-              />
-            ) : (
-              <Chip
-                icon={<PlaylistRemoveIcon />}
-                label={formMessage.message}
-                color="warning"
-                variant="outlined"
-              />
-            )}
-          </Box>
-        )}
-      </Form>
+      <Header eventInfo={eventInfo}></Header>
+      <Box className="requests-view">
+        <Form OnSubmit={SubmitForm} formDisabled={formDisabled}>
+          {formMessage.message && (
+            <Box
+              className="form-message"
+              sx={{
+                "& .MuiChip-outlined": {
+                  border: "none",
+                },
+              }}
+            >
+              {formMessage.result === "success" ? (
+                <Chip
+                  icon={<PlaylistAddCheckIcon />}
+                  label={formMessage.message}
+                  color="success"
+                  variant="outlined"
+                  sx={{
+                    "& MuiChip-outlined": {
+                      border: "none",
+                    },
+                  }}
+                />
+              ) : (
+                <Chip
+                  icon={<PlaylistRemoveIcon />}
+                  label={formMessage.message}
+                  color="warning"
+                  variant="outlined"
+                />
+              )}
+            </Box>
+          )}
+        </Form>
+      </Box>
     </div>
   );
 }
