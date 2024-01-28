@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { Form } from "../Components/Form";
-import { postData, getData } from "../Api/api";
+import { postData, getData } from "../api/api";
 import Chip from "@mui/material/Chip";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import PlaylistRemoveIcon from "@mui/icons-material/PlaylistRemove";
@@ -71,7 +71,7 @@ function RequestASong() {
   return (
     <div className="container">
       <img
-        src={"/request_a_song.jpg"}
+        src={"/images/request_a_song.jpg"}
         className="request-a-song-image"
         alt="Request a song"
       />

@@ -47,8 +47,6 @@ export const Form = ({ children, OnSubmit, formDisabled }) => {
     },
   });
 
-  console.log({ children });
-
   return (
     <ThemeProvider theme={darkTheme}>
       <Box
