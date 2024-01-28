@@ -19,12 +19,16 @@ app.get("/events/:eventId", async function (req, res) {
   try {
     const eventId = req.params.eventId;
     if (!eventId) {
-      res.status(404).json({ error: "Event not found" });
+      res.status(404).json({
+        severity: "error",
+        title: "404",
+        message: "Event not found",
+      });
     } else {
       const params = {
         TableName: process.env.EVENTS_TABLE,
         Key: {
-          event_id: eventId.toLowerCase();,
+          event_id: eventId.toLowerCase(),
         },
       };
 
@@ -33,14 +37,20 @@ app.get("/events/:eventId", async function (req, res) {
         const { event_id: eventId, name, date } = Item;
         res.json({ eventId, name, date });
       } else {
-        res
-          .status(404)
-          .json({ error: `Could not find event with id ${eventId}` });
+        res.status(404).json({
+          severity: "error",
+          title: "404",
+          message: `Could not find event with id ${eventId}`,
+        });
       }
     }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Could not retreive event information" });
+    res.status(500).json({
+      severity: "error",
+      title: "Error",
+      message: "Could not retreive event information",
+    });
   }
 });
 
@@ -51,7 +61,11 @@ app.get("/requests/:eventId", async function (req, res) {
     const eventId = req.params.eventId;
 
     if (!eventId) {
-      res.status(404).json({ error: "Event not found" });
+      res.status(404).json({
+        severity: "error",
+        title: "404",
+        message: "Event not found",
+      });
     } else {
       const params = {
         TableName: process.env.REQUESTS_TABLE,
@@ -74,7 +88,11 @@ app.get("/requests/:eventId", async function (req, res) {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Could not retrieve requests" });
+    res.status(500).json({
+      severity: "error",
+      title: "Error",
+      message: "Could not retrieve requests",
+    });
   }
 });
 
@@ -83,18 +101,34 @@ app.post("/requests/:eventId", async function (req, res) {
     const eventId = req.params.eventId;
     const { songTitle, artistName, requestorName, eventName } = req.body;
     if (!eventId) {
-      res.status(404).json({ error: "Event not found" });
+      res.status(404).json({
+        severity: "error",
+        title: "404",
+        message: "Event not found",
+      });
     } else if (typeof songTitle !== "string") {
-      res.status(400).json({ error: '"songTitle" must be a string' });
+      res.status(400).json({
+        severity: "error",
+        title: "404",
+        message: '"songTitle" must be a string',
+      });
     } else if (typeof artistName !== "string") {
-      res.status(400).json({ error: '"artistName" must be a string' });
+      res.status(400).json({
+        severity: "error",
+        title: "404",
+        message: '"artistName" must be a string',
+      });
     } else if (typeof requestorName !== "string") {
-      res.status(400).json({ error: '"requestorName" must be a string' });
+      res.status(400).json({
+        severity: "error",
+        title: "404",
+        message: '"requestorName" must be a string',
+      });
     } else {
       const params = {
         TableName: process.env.REQUESTS_TABLE,
         Item: {
-          event_name: eventId.toLowerCase();,
+          event_name: eventId.toLowerCase(),
           submission_timestamp: Date.now(),
           song_title: songTitle ?? "",
           artist_name: artistName ?? "",
@@ -104,7 +138,9 @@ app.post("/requests/:eventId", async function (req, res) {
 
       console.log("Submitting Put request: ", params);
       await dynamoDbClient.send(new PutCommand(params));
-      res.json({
+      res.status(200).json({
+        severity: "success",
+        title: "Success",
         message: `Thank you for your request${
           requestorName == "" ? ":" : `, ${requestorName.split(" ")[0]}!`
         } ${songTitle} by ${artistName}`,
@@ -112,13 +148,19 @@ app.post("/requests/:eventId", async function (req, res) {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Could not submit song request" });
+    res.status(500).json({
+      severity: "error",
+      title: "Error",
+      message: "Could not submit song request",
+    });
   }
 });
 
 app.use((req, res, next) => {
   return res.status(404).json({
-    error: "Path not Found",
+    severity: "error",
+    title: "404",
+    message: "Path not found",
   });
 });
 
