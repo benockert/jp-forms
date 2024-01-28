@@ -4,8 +4,8 @@ frameworkVersion: "3"
 custom:
   deploymentBucketName: "serverless-deployment-fghjkl389xc7a"
   requestsTableName: "song-requests-form-submission-${sls:stage}"
+  eventsTableName: "jamin-productions-events-${sls:stage}"
   stackName: "song-requests-backend-stack-${sls:stage}"
-  eventName: "Bentley_Gala_2024"
 
 provider:
   name: aws
@@ -34,9 +34,10 @@ provider:
             - dynamodb:DeleteItem
           Resource:
             - Fn::GetAtt: [RequestsTable, Arn]
+            - Fn::GetAtt: [EventsTable, Arn]
   environment:
     REQUESTS_TABLE: ${self:custom.requestsTableName}
-    EVENT_NAME: ${self:custom.eventName}
+    EVENTS_TABLE: ${self:custom.eventsTableName}
   httpApi:
     cors: true
 
@@ -67,6 +68,20 @@ resources:
           - AttributeName: submission_timestamp
             KeyType: RANGE
         TableName: ${self:custom.requestsTableName}
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    EventsTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: event_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: event_id
+            KeyType: HASH
+        TableName: ${self:custom.eventsTableName}
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
