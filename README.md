@@ -9,3 +9,4 @@ Made for 'Jamin Productions
 - [ ] Create dashboard for viewing list of requests
 - [ ] Rewrite Form.js to make use of children props so SubmitRequest.js can handle the message compontents rather than passing info to Form.js
 - [ ] Create favicon and logos
+- [ ] Route api gateway to custom domain

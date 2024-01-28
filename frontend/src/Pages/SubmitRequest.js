@@ -10,6 +10,9 @@ export async function requestsPageLoader({ request }) {
   return getData(`events/${eventId}`);
 }
 
+const requestLimitReachedMessage =
+  "Sorry, your request limit has been reached.";
+
 function SubmitRequest() {
   const { eventId } = useParams();
   const eventInfo = useLoaderData();
@@ -25,7 +28,7 @@ function SubmitRequest() {
     // compare to limit
     if (count >= eventInfo.requestLimit) {
       setFormDisabled(true);
-      setFormMessage({ message: "Sorry, the request limit has been reached." });
+      setFormMessage({ message: requestLimitReachedMessage });
     } else {
       setFormDisabled(false);
     }
