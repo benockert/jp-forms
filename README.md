@@ -1,6 +1,6 @@
 # Song Requests Form
 
-## Made for 'Jamin Productions events
+Made for 'Jamin Productions
 
 #### To-do
 
