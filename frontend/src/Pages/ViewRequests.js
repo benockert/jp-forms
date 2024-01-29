@@ -12,6 +12,8 @@ import MusicNoteIcon from "@mui/icons-material/MusicNote";
 
 import "./ViewRequests.css";
 
+const noRequestsMessage = "No requests yet!";
+
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
   ...theme.typography.body2,
@@ -25,12 +27,16 @@ export async function viewRequestsPageLoader({ request }) {
   const { data: eventInfo, statusCode } = await getData(`events/${eventId}`);
   const { data: eventRequests } = await getData(`requests/${eventId}`);
 
-  if (statusCode == 404) {
-    return redirect("/?404");
+  if (statusCode === 404) {
+    return redirect("/");
   } else {
     return { eventInfo, eventRequests };
   }
 }
+
+const NoRequests = () => {
+  return <Item>{noRequestsMessage}</Item>;
+};
 
 const ViewRequests = () => {
   const { eventInfo, eventRequests } = useLoaderData();
@@ -48,29 +54,33 @@ const ViewRequests = () => {
         className="requests-view"
       >
         <Stack spacing={2}>
-          {eventRequests.map((request, idx) => {
-            return (
-              <Item key={idx}>
-                <Stack
-                  justifyContent="center"
-                  alignItems="center"
-                  direction={{ xs: "column", sm: "row" }}
-                  spacing={2}
-                >
-                  <Chip
-                    icon={<MusicNoteIcon />}
-                    label={request.song_title}
-                    variant="outlined"
-                  />
-                  <Chip
-                    icon={<PersonIcon />}
-                    label={request.artist_name}
-                    variant="outlined"
-                  />
-                </Stack>
-              </Item>
-            );
-          })}
+          {eventRequests?.length ? (
+            eventRequests.map((request, idx) => {
+              return (
+                <Item key={idx}>
+                  <Stack
+                    justifyContent="center"
+                    alignItems="center"
+                    direction={{ xs: "column", sm: "row" }}
+                    spacing={2}
+                  >
+                    <Chip
+                      icon={<MusicNoteIcon />}
+                      label={request.song_title}
+                      variant="outlined"
+                    />
+                    <Chip
+                      icon={<PersonIcon />}
+                      label={request.artist_name}
+                      variant="outlined"
+                    />
+                  </Stack>
+                </Item>
+              );
+            })
+          ) : (
+            <NoRequests />
+          )}
         </Stack>
       </Box>
     </div>

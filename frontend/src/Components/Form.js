@@ -29,7 +29,6 @@ export const Form = ({
       notes: "",
     },
     onSubmit: (values, { resetForm }) => {
-      console.log("Submitting");
       handleSubmit(values);
       resetForm();
     },
