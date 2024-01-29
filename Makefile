@@ -7,5 +7,7 @@ deploy-frontend:
 deploy-backend:
 	cd backend && serverless deploy --stage prod
 
+deploy-prod: deploy-frontend deploy-backend
+
 test-prod-build:
 	cd frontend && npm run build && npx serve -s build
