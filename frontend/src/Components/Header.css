@@ -1,7 +1,7 @@
-.event-date {
-    font-size: 14px;
+.header-title {
+    margin: 5px;
 }
 
-.event-name {
-    margin: 5px;
+.header-subtitle {
+    font-size: 16px;
 }

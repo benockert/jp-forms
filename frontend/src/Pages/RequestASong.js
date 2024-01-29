@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLoaderData } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import { useParams, redirect } from "react-router-dom";
 import { Form } from "../Components/Form";
 import Header from "../Components/Header";
 import { postData, getData } from "../api/api";
@@ -12,18 +12,26 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 import "./RequestASong.css";
 
+// Note: I don't love each loader having to implement this logic,
+// but at least it allows each page to decide what to do if the
+// url is invalid
 export async function requestASongPageLoader({ request }) {
   const eventId = new URL(request.url).pathname.split("/")[1];
-  return getData(`events/${eventId}`);
+  return await getData(`events/${eventId}`).then((res) => {
+    if (res.statusCode == 404) {
+      return redirect("/");
+    } else {
+      return res.data;
+    }
+  });
 }
 
-const requestLimitReachedMessage =
-  "Sorry, your request limit has been reached.";
+const requestLimitReachedMessage = "Your request limit has been reached.";
 
 function RequestASong() {
   const { eventId } = useParams();
   const eventInfo = useLoaderData();
-  const [formMessages, setFormMessages] = useState([]);
+  const [formMessage, setFormMessage] = useState({});
   const [formDisabled, setFormDisabled] = useState(true);
   const [requestCount, setRequestCount] = useState(() => {
     // load request count from local storage
@@ -35,10 +43,7 @@ function RequestASong() {
     // compare to limit
     if (count >= eventInfo.requestLimit) {
       setFormDisabled(true);
-      setFormMessages([
-        ...formMessages,
-        { message: requestLimitReachedMessage },
-      ]);
+      setFormMessage({ message: requestLimitReachedMessage });
     } else {
       // if under limit, enable the form
       setFormDisabled(false);
@@ -47,12 +52,8 @@ function RequestASong() {
     return count;
   });
 
-  useEffect(() => {
-    console.log({ formMessages });
-  }, [formMessages]);
-
   const SubmitForm = (values) => {
-    setFormMessages([]);
+    setFormMessage({});
 
     const {
       song: songTitle,
@@ -66,7 +67,7 @@ function RequestASong() {
       requestorName,
       requestNotes,
     }).then((data) => {
-      let messages = [...formMessages, data];
+      let message = data;
 
       if (data.result === "success") {
         const count = requestCount + 1;
@@ -79,20 +80,35 @@ function RequestASong() {
         // disable the form if we have reached our limit
         if (count >= eventInfo.requestLimit) {
           setFormDisabled(true);
-          messages = [...messages, { message: requestLimitReachedMessage }];
+          message = {
+            ...message,
+            message: `${message.message} ${requestLimitReachedMessage}`,
+          };
+        } else {
+          const requestsRemaining = eventInfo.requestLimit - count;
+          message = {
+            ...message,
+            message: `${message.message} ${requestsRemaining} request${
+              requestsRemaining - 1 ? "s" : ""
+            } remaining.`,
+          };
         }
-
-        setFormMessages(messages);
       }
+
+      setFormMessage(message);
     });
   };
 
   return (
     <div className="container">
-      <Header eventInfo={eventInfo}></Header>
+      <Header title={eventInfo.name} subtitle={eventInfo.date}></Header>
       <Box className="requests-view">
-        <Form OnSubmit={SubmitForm} formDisabled={formDisabled}>
-          {!!formMessages.length && (
+        <Form
+          handleSubmit={SubmitForm}
+          clearMessages={() => setFormMessage({})}
+          formDisabled={formDisabled}
+        >
+          {formMessage.message && (
             <Box
               className="form-message"
               sx={{
@@ -101,38 +117,33 @@ function RequestASong() {
                 },
               }}
             >
-              {formMessages.map((formMessage, idx) => {
-                return formMessage.result === "success" ? (
-                  <Chip
-                    icon={<PlaylistAddCheckIcon />}
-                    label={formMessage.message}
-                    key={idx}
-                    color="success"
-                    variant="outlined"
-                    sx={{
-                      "& MuiChip-outlined": {
-                        border: "none",
-                      },
-                    }}
-                  />
-                ) : formMessage.result === "error" ? (
-                  <Chip
-                    icon={<ErrorOutlineIcon />}
-                    label={formMessage.message}
-                    key={idx}
-                    color="error"
-                    variant="outline"
-                  />
-                ) : (
-                  <Chip
-                    icon={<PlaylistRemoveIcon />}
-                    label={formMessage.message}
-                    key={idx}
-                    color="warning"
-                    variant="outlined"
-                  />
-                );
-              })}
+              {formMessage.result === "success" ? (
+                <Chip
+                  icon={<PlaylistAddCheckIcon />}
+                  label={formMessage.message}
+                  color="success"
+                  variant="outlined"
+                  sx={{
+                    "& MuiChip-outlined": {
+                      border: "none",
+                    },
+                  }}
+                />
+              ) : formMessage.result === "error" ? (
+                <Chip
+                  icon={<ErrorOutlineIcon />}
+                  label={formMessage.message}
+                  color="error"
+                  variant="outlined"
+                />
+              ) : (
+                <Chip
+                  icon={<PlaylistRemoveIcon />}
+                  label={formMessage.message}
+                  color="warning"
+                  variant="outlined"
+                />
+              )}
             </Box>
           )}
         </Form>

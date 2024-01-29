@@ -1,6 +1,5 @@
 import React from "react";
-import { useLoaderData } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import { useLoaderData, redirect } from "react-router-dom";
 import { getData } from "../api/api";
 import Header from "../Components/Header";
 import Box from "@mui/material/Box";
@@ -23,18 +22,22 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export async function viewRequestsPageLoader({ request }) {
   const eventId = new URL(request.url).pathname.split("/")[1];
-  const eventInfo = await getData(`events/${eventId}`);
-  const eventRequests = await getData(`requests/${eventId}`);
-  return { eventInfo, eventRequests };
+  const { data: eventInfo, statusCode } = await getData(`events/${eventId}`);
+  const { data: eventRequests } = await getData(`requests/${eventId}`);
+
+  if (statusCode == 404) {
+    return redirect("/?404");
+  } else {
+    return { eventInfo, eventRequests };
+  }
 }
 
 const ViewRequests = () => {
-  const { eventId } = useParams();
   const { eventInfo, eventRequests } = useLoaderData();
 
   return (
     <div className="container">
-      <Header eventInfo={eventInfo}></Header>
+      <Header title={eventInfo.name} subtitle={eventInfo.date}></Header>
       <Box
         sx={{
           "& .MuiChip-outlined": {
@@ -45,9 +48,9 @@ const ViewRequests = () => {
         className="requests-view"
       >
         <Stack spacing={2}>
-          {eventRequests.map((request) => {
+          {eventRequests.map((request, idx) => {
             return (
-              <Item>
+              <Item key={idx}>
                 <Stack
                   justifyContent="center"
                   alignItems="center"

@@ -11,18 +11,26 @@ const formValidationSchema = yup.object({
   song: yup.string().required("Song title is required"),
   artist: yup.string().required("Artist name is required"),
   name: yup.string(),
+  notes: yup.string(),
 });
 
-export const Form = ({ children, OnSubmit, formDisabled }) => {
+export const Form = ({
+  children,
+  handleSubmit,
+  clearMessages,
+  formDisabled,
+}) => {
   const formik = useFormik({
     validationSchema: formValidationSchema,
     initialValues: {
       name: "",
       song: "",
       artist: "",
+      notes: "",
     },
     onSubmit: (values, { resetForm }) => {
-      OnSubmit(values);
+      console.log("Submitting");
+      handleSubmit(values);
       resetForm();
     },
   });
@@ -31,63 +39,82 @@ export const Form = ({ children, OnSubmit, formDisabled }) => {
     <Box
       sx={{
         display: "flex",
-        alignContent: "left",
+        alignContent: "center",
+        justifyContent: "center",
         flexWrap: "wrap",
       }}
+      className="requests-form"
     >
-      <div className="requests-form">
-        <form onSubmit={formik.handleSubmit}>
-          <TextField
-            fullWidth
-            className="form-field"
-            id="form-song-title"
-            name="song"
-            label="Song title"
-            disabled={formDisabled}
-            value={formik.values.song}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.song && Boolean(formik.errors.song)}
-            helperText={formik.touched.song && formik.errors.song}
-          />
-          <TextField
-            fullWidth
-            className="form-field"
-            id="form-song-artist"
-            name="artist"
-            label="Artist name"
-            disabled={formDisabled}
-            value={formik.values.artist}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.artist && Boolean(formik.errors.artist)}
-            helperText={formik.touched.artist && formik.errors.artist}
-          />
-          <TextField
-            fullWidth
-            className="form-field"
-            id="form-name"
-            name="name"
-            label="Your name (optional)"
-            disabled={formDisabled}
-            value={formik.values.name}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.name && Boolean(formik.errors.name)}
-            helperText={formik.touched.name && formik.errors.name}
-          />
-          <Button
-            color="primary"
-            variant="contained"
-            fullWidth
-            type="submit"
-            disabled={formDisabled}
-          >
-            Submit
-          </Button>
-        </form>
-        {!!children && <div>{children}</div>}
-      </div>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          clearMessages();
+          formik.handleSubmit();
+        }}
+      >
+        <TextField
+          fullWidth
+          className="form-field"
+          id="form-song-title"
+          name="song"
+          label="Song title"
+          disabled={formDisabled}
+          value={formik.values.song}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.song && Boolean(formik.errors.song)}
+          helperText={formik.touched.song && formik.errors.song}
+        />
+        <TextField
+          fullWidth
+          className="form-field"
+          id="form-song-artist"
+          name="artist"
+          label="Artist name"
+          disabled={formDisabled}
+          value={formik.values.artist}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.artist && Boolean(formik.errors.artist)}
+          helperText={formik.touched.artist && formik.errors.artist}
+        />
+        <TextField
+          fullWidth
+          className="form-field"
+          id="form-name"
+          name="name"
+          label="Your name (optional)"
+          disabled={formDisabled}
+          value={formik.values.name}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.name && Boolean(formik.errors.name)}
+          helperText={formik.touched.name && formik.errors.name}
+        />
+        <TextField
+          fullWidth
+          className="form-field"
+          id="form-request-notes"
+          name="notes"
+          label="Notes (optional)"
+          disabled={formDisabled}
+          value={formik.values.notes}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.notes && Boolean(formik.errors.notes)}
+          helperText={formik.touched.notes && formik.errors.notes}
+        />
+        <Button
+          color="primary"
+          variant="contained"
+          fullWidth
+          type="submit"
+          disabled={formDisabled || formik.isSubmitting}
+        >
+          Submit
+        </Button>
+      </form>
+      {!!children && <div>{children}</div>}
     </Box>
   );
 };

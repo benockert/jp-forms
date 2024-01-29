@@ -4,13 +4,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     text-align: center;
     font-size: calc(18px + 2vmin);
     color: white;
-}
-
-.requests-view {
-    width: clamp(250px, 90%, 600px);
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
 }

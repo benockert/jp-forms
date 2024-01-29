@@ -1,6 +1,11 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  redirect,
+} from "react-router-dom";
 import RequestASong, { requestASongPageLoader } from "./Pages/RequestASong";
 import ViewRequests, { viewRequestsPageLoader } from "./Pages/ViewRequests";
+import Home from "./Pages/Home";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const darkTheme = createTheme({
@@ -26,6 +31,10 @@ const darkTheme = createTheme({
 function App() {
   const router = createBrowserRouter([
     {
+      path: "/",
+      element: <Home />,
+    },
+    {
       path: "/:eventId",
       element: <RequestASong />,
       loader: requestASongPageLoader,
@@ -34,6 +43,13 @@ function App() {
       path: "/:eventId/view",
       element: <ViewRequests />,
       loader: viewRequestsPageLoader,
+    },
+    {
+      // 404: page not found
+      path: "*",
+      loader: async () => {
+        return redirect("/");
+      },
     },
   ]);
 

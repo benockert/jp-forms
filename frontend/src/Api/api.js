@@ -16,5 +16,6 @@ export async function postData(path, data = {}) {
 
 export async function getData(path) {
   const response = await fetch(`${API_URL}${path}`);
-  return response.json();
+  const body = await response.json();
+  return { statusCode: response.status, data: body };
 }

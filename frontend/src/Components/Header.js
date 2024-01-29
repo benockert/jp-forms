@@ -1,7 +1,6 @@
 import "./Header.css";
 
-const Header = ({ eventInfo }) => {
-  console.log({ eventInfo });
+const Header = ({ title, subtitle }) => {
   return (
     <div>
       <img
@@ -10,8 +9,8 @@ const Header = ({ eventInfo }) => {
         alt="Request a song"
       />
       <div>
-        <p className="event-name">{eventInfo.name}</p>
-        <p className="event-date">{eventInfo.date}</p>
+        <p className="header-title">{title}</p>
+        <p className="header-subtitle">{subtitle}</p>
       </div>
     </div>
   );

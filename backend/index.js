@@ -12,8 +12,18 @@ const app = express();
 const client = new DynamoDBClient();
 const dynamoDbClient = DynamoDBDocumentClient.from(client);
 
+const errorMessage = "Error submitting form ";
+
 app.use(express.json());
 app.use(express.urlencoded()); // needed to handle form-data submissions
+
+app.use((req, res, next) => {
+  console.log("New request at time:", Date.now(), "to path", req.path);
+  console.log("Request body:", req.body);
+
+  // call so continues to routes
+  next();
+});
 
 app.get("/events/:eventId", async function (req, res) {
   try {
@@ -81,7 +91,7 @@ app.get("/requests/:eventId", async function (req, res) {
         ProjectionExpression: "#ap0,#ap1,#ap2",
       };
 
-      console.log("Submitting Scan request: ", params);
+      console.log("Submitting Scan request:", params);
       const { Items } = await dynamoDbClient.send(new ScanCommand(params));
       res.json(Items);
     }
@@ -97,7 +107,7 @@ app.get("/requests/:eventId", async function (req, res) {
 app.post("/requests/:eventId", async function (req, res) {
   try {
     const eventId = req.params.eventId;
-    const { songTitle, artistName, requestorName, eventName } = req.body;
+    const { songTitle, artistName, requestorName, requestNotes } = req.body;
     if (!eventId) {
       res.status(404).json({
         result: "error",
@@ -106,17 +116,22 @@ app.post("/requests/:eventId", async function (req, res) {
     } else if (typeof songTitle !== "string") {
       res.status(400).json({
         result: "error",
-        message: '"songTitle" must be a string',
+        message: errorMessage + "(field: song title)",
       });
     } else if (typeof artistName !== "string") {
       res.status(400).json({
         result: "error",
-        message: '"artistName" must be a string',
+        message: errorMessage + "(field: artist name)",
       });
     } else if (typeof requestorName !== "string") {
       res.status(400).json({
         result: "error",
-        message: '"requestorName" must be a string',
+        message: errorMessage + "(field: your name)",
+      });
+    } else if (typeof requestNotes !== "string") {
+      res.status(400).json({
+        result: "error",
+        message: errorMessage + "(field: notes)",
       });
     } else {
       const params = {
@@ -127,10 +142,11 @@ app.post("/requests/:eventId", async function (req, res) {
           song_title: songTitle ?? "",
           artist_name: artistName ?? "",
           requestor_name: requestorName ?? "",
+          notes: requestNotes ?? "",
         },
       };
 
-      console.log("Submitting Put request: ", params);
+      console.log("Submitting Put request:", params);
       await dynamoDbClient.send(new PutCommand(params));
       res.status(200).json({
         result: "success",
