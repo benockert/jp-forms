@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { useParams, redirect } from "react-router-dom";
 import { Form } from "../Components/Form";
@@ -18,7 +18,7 @@ import "./RequestASong.css";
 export async function requestASongPageLoader({ request }) {
   const eventId = new URL(request.url).pathname.split("/")[1];
   return await getData(`events/${eventId}`).then((res) => {
-    if (res.statusCode == 404) {
+    if (res.statusCode === 404) {
       return redirect("/");
     } else {
       return res.data;
@@ -33,6 +33,7 @@ const requestLimitReachedMessage = "Your request limit has been reached.";
 function RequestASong() {
   const { eventId } = useParams();
   const eventInfo = useLoaderData();
+  const limitEnforced = !!eventInfo.requestLimit;
   const [formMessage, setFormMessage] = useState({});
   const [formDisabled, setFormDisabled] = useState(true);
   const [requestCount, setRequestCount] = useState(() => {
@@ -50,7 +51,7 @@ function RequestASong() {
     }
 
     // compare to limit
-    if (count >= eventInfo.requestLimit) {
+    if (limitEnforced && count >= eventInfo.requestLimit) {
       setFormDisabled(true);
       setFormMessage({ message: requestLimitReachedMessage });
     } else {
@@ -60,6 +61,17 @@ function RequestASong() {
 
     return count;
   });
+
+  const RequestsRemainingText = (count) => {
+    if (limitEnforced) {
+      const requestsRemaining = eventInfo.requestLimit - count;
+      return ` You have ${requestsRemaining} request${
+        requestsRemaining - 1 ? "s" : ""
+      } remaining.`;
+    } else {
+      return "";
+    }
+  };
 
   const SubmitForm = (values) => {
     setFormMessage({});
@@ -91,19 +103,16 @@ function RequestASong() {
         }
 
         // disable the form if we have reached our limit
-        if (count >= eventInfo.requestLimit) {
+        if (limitEnforced && count >= eventInfo.requestLimit) {
           setFormDisabled(true);
           message = {
             ...message,
             message: `${message.message} ${requestLimitReachedMessage}`,
           };
         } else {
-          const requestsRemaining = eventInfo.requestLimit - count;
           message = {
             ...message,
-            message: `${message.message} ${requestsRemaining} request${
-              requestsRemaining - 1 ? "s" : ""
-            } remaining.`,
+            message: `${message.message}${RequestsRemainingText(count)}`,
           };
         }
       }
