@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLoaderData } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { Form } from "../Components/Form";
@@ -8,6 +8,7 @@ import Chip from "@mui/material/Chip";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import PlaylistRemoveIcon from "@mui/icons-material/PlaylistRemove";
 import Box from "@mui/material/Box";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 import "./RequestASong.css";
 
@@ -22,7 +23,7 @@ const requestLimitReachedMessage =
 function RequestASong() {
   const { eventId } = useParams();
   const eventInfo = useLoaderData();
-  const [formMessage, setFormMessage] = useState({});
+  const [formMessages, setFormMessages] = useState([]);
   const [formDisabled, setFormDisabled] = useState(true);
   const [requestCount, setRequestCount] = useState(() => {
     // load request count from local storage
@@ -34,7 +35,10 @@ function RequestASong() {
     // compare to limit
     if (count >= eventInfo.requestLimit) {
       setFormDisabled(true);
-      setFormMessage({ message: requestLimitReachedMessage });
+      setFormMessages([
+        ...formMessages,
+        { message: requestLimitReachedMessage },
+      ]);
     } else {
       // if under limit, enable the form
       setFormDisabled(false);
@@ -43,16 +47,26 @@ function RequestASong() {
     return count;
   });
 
-  const SubmitForm = (values) => {
-    setFormMessage({});
+  useEffect(() => {
+    console.log({ formMessages });
+  }, [formMessages]);
 
-    const { song: songTitle, artist: artistName, name: requestorName } = values;
+  const SubmitForm = (values) => {
+    setFormMessages([]);
+
+    const {
+      song: songTitle,
+      artist: artistName,
+      name: requestorName,
+      notes: requestNotes,
+    } = values;
     postData(`requests/${eventId}`, {
       songTitle,
       artistName,
       requestorName,
+      requestNotes,
     }).then((data) => {
-      setFormMessage(data);
+      let messages = [...formMessages, data];
 
       if (data.result === "success") {
         const count = requestCount + 1;
@@ -65,7 +79,10 @@ function RequestASong() {
         // disable the form if we have reached our limit
         if (count >= eventInfo.requestLimit) {
           setFormDisabled(true);
+          messages = [...messages, { message: requestLimitReachedMessage }];
         }
+
+        setFormMessages(messages);
       }
     });
   };
@@ -75,7 +92,7 @@ function RequestASong() {
       <Header eventInfo={eventInfo}></Header>
       <Box className="requests-view">
         <Form OnSubmit={SubmitForm} formDisabled={formDisabled}>
-          {formMessage.message && (
+          {!!formMessages.length && (
             <Box
               className="form-message"
               sx={{
@@ -84,26 +101,38 @@ function RequestASong() {
                 },
               }}
             >
-              {formMessage.result === "success" ? (
-                <Chip
-                  icon={<PlaylistAddCheckIcon />}
-                  label={formMessage.message}
-                  color="success"
-                  variant="outlined"
-                  sx={{
-                    "& MuiChip-outlined": {
-                      border: "none",
-                    },
-                  }}
-                />
-              ) : (
-                <Chip
-                  icon={<PlaylistRemoveIcon />}
-                  label={formMessage.message}
-                  color="warning"
-                  variant="outlined"
-                />
-              )}
+              {formMessages.map((formMessage, idx) => {
+                return formMessage.result === "success" ? (
+                  <Chip
+                    icon={<PlaylistAddCheckIcon />}
+                    label={formMessage.message}
+                    key={idx}
+                    color="success"
+                    variant="outlined"
+                    sx={{
+                      "& MuiChip-outlined": {
+                        border: "none",
+                      },
+                    }}
+                  />
+                ) : formMessage.result === "error" ? (
+                  <Chip
+                    icon={<ErrorOutlineIcon />}
+                    label={formMessage.message}
+                    key={idx}
+                    color="error"
+                    variant="outline"
+                  />
+                ) : (
+                  <Chip
+                    icon={<PlaylistRemoveIcon />}
+                    label={formMessage.message}
+                    key={idx}
+                    color="warning"
+                    variant="outlined"
+                  />
+                );
+              })}
             </Box>
           )}
         </Form>
