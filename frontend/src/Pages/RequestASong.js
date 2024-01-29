@@ -26,6 +26,8 @@ export async function requestASongPageLoader({ request }) {
   });
 }
 
+const localStorageAccessDenied =
+  "Unable to access local storage to retrieve request count.";
 const requestLimitReachedMessage = "Your request limit has been reached.";
 
 function RequestASong() {
@@ -35,10 +37,17 @@ function RequestASong() {
   const [formDisabled, setFormDisabled] = useState(true);
   const [requestCount, setRequestCount] = useState(() => {
     // load request count from local storage
-    const count =
-      parseInt(
-        localStorage.getItem(`jamin-productions-requests-form-${eventId}-count`)
-      ) || 0;
+    let count = 0;
+    try {
+      count =
+        parseInt(
+          localStorage.getItem(
+            `jamin-productions-requests-form-${eventId.toLowerCase()}-count`
+          )
+        ) || 0;
+    } catch (error) {
+      console.error(localStorageAccessDenied);
+    }
 
     // compare to limit
     if (count >= eventInfo.requestLimit) {
@@ -72,10 +81,14 @@ function RequestASong() {
       if (data.result === "success") {
         const count = requestCount + 1;
         setRequestCount(count);
-        localStorage.setItem(
-          `jamin-productions-requests-form-${eventId}-count`,
-          count
-        );
+        try {
+          localStorage.setItem(
+            `jamin-productions-requests-form-${eventId.toLowerCase()}-count`,
+            count
+          );
+        } catch (error) {
+          console.error(localStorageAccessDenied);
+        }
 
         // disable the form if we have reached our limit
         if (count >= eventInfo.requestLimit) {
