@@ -8,7 +8,7 @@ import ViewRequests, { viewRequestsPageLoader } from "./Pages/ViewRequests";
 import Home from "./Pages/Home";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
-const darkTheme = createTheme({
+const theme = createTheme({
   palette: {
     mode: "dark",
   },
@@ -25,6 +25,15 @@ const darkTheme = createTheme({
       '"Segoe UI Emoji"',
       '"Segoe UI Symbol"',
     ].join(","),
+  },
+  components: {
+    MuiChip: {
+      styleOverrides: {
+        label: {
+          whiteSpace: "normal", // to allow line break where necessary (mobile devices)
+        },
+      },
+    },
   },
 });
 
@@ -54,7 +63,7 @@ function App() {
   ]);
 
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme}>
       <RouterProvider router={router} />
     </ThemeProvider>
   );
