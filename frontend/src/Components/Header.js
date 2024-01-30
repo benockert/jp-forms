@@ -2,7 +2,7 @@ import "./Header.css";
 
 const Header = ({ title, subtitle }) => {
   return (
-    <div>
+    <div className="page-header">
       <img
         src={"/images/request_a_song.jpg"}
         className="request-a-song-image"

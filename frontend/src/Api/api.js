@@ -4,18 +4,29 @@ const API_URL =
     : "https://yozv3qlx9a.execute-api.us-west-2.amazonaws.com/";
 
 export async function postData(path, data = {}) {
-  const response = await fetch(`${API_URL}${path}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams(data),
-  });
-  return response.json();
+  try {
+    const response = await fetch(`${API_URL}${path}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams(data),
+    });
+    return response.json();
+  } catch (error) {
+    return {
+      result: "error",
+      message: "An error has occurred. Please try again.",
+    };
+  }
 }
 
 export async function getData(path) {
-  const response = await fetch(`${API_URL}${path}`);
-  const body = await response.json();
-  return { statusCode: response.status, data: body };
+  try {
+    const response = await fetch(`${API_URL}${path}`);
+    const body = await response.json();
+    return { statusCode: response.status, data: body };
+  } catch (error) {
+    return {};
+  }
 }

@@ -21,7 +21,7 @@ export async function requestASongPageLoader({ request }) {
     if (res.statusCode === 404) {
       return redirect("/");
     } else {
-      return res.data;
+      return res.data ?? {};
     }
   });
 }
