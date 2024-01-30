@@ -113,7 +113,7 @@ export const Form = ({
           Submit
         </Button>
       </form>
-      {!!children && <div>{children}</div>}
+      {!!children && <div className="form-children">{children}</div>}
     </Box>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLoaderData } from "react-router-dom";
 import { useParams, redirect } from "react-router-dom";
 import { Form } from "../Components/Form";
@@ -61,6 +61,10 @@ function RequestASong() {
 
     return count;
   });
+
+  useEffect(() => {
+    document.title = `Song Requests - ${eventInfo.name}`;
+  }, [eventInfo]);
 
   const RequestsRemainingText = (count) => {
     if (limitEnforced) {

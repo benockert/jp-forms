@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useLoaderData, redirect } from "react-router-dom";
 import { getData } from "../api/api";
 import Header from "../Components/Header";
@@ -40,6 +40,10 @@ const NoRequests = () => {
 
 const ViewRequests = () => {
   const { eventInfo, eventRequests } = useLoaderData();
+
+  useEffect(() => {
+    document.title = `View Requests - ${eventInfo.name}`;
+  }, [eventInfo]);
 
   return (
     <div className="container">
