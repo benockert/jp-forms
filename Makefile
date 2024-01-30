@@ -11,3 +11,6 @@ deploy-prod: deploy-frontend deploy-backend
 
 test-prod-build:
 	cd frontend && npm run build && npx serve -s build
+
+add-new-event:
+	cd scripts && ./new_event.bat
