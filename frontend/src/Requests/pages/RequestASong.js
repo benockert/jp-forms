@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useLoaderData } from "react-router-dom";
 import { useParams, redirect } from "react-router-dom";
-import { Form } from "../Components/Form";
-import Header from "../Components/Header";
-import { postData, getData } from "../api/api";
+import { Form } from "../components/Form";
+import Header from "../components/Header";
+import { postData, getData } from "../api";
 import Chip from "@mui/material/Chip";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import PlaylistRemoveIcon from "@mui/icons-material/PlaylistRemove";
 import Box from "@mui/material/Box";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { ThemeProvider } from "@mui/material/styles";
+import { requestsFormTheme } from "../themes";
 
 import "./RequestASong.css";
 
 // Note: I don't love each loader having to implement this logic,
 // but at least it allows each page to decide what to do if the
 // url is invalid
-export async function requestASongPageLoader({ request }) {
-  const eventId = new URL(request.url).pathname.split("/")[1];
+export async function requestASongPageLoader({ params, request }) {
+  const eventId = params.eventId;
   return await getData(`events/${eventId}`).then((res) => {
     if (res.statusCode === 404) {
       return redirect("/");
@@ -63,7 +65,7 @@ function RequestASong() {
   });
 
   useEffect(() => {
-    document.title = `Song Requests - ${eventInfo.name}`;
+    document.title = `Request A Song - ${eventInfo.name}`;
   }, [eventInfo]);
 
   const RequestsRemainingText = (count) => {
@@ -126,55 +128,57 @@ function RequestASong() {
   };
 
   return (
-    <div className="container">
-      <Header title={eventInfo.name} subtitle={eventInfo.date}></Header>
-      <Box className="requests-view">
-        <Form
-          handleSubmit={SubmitForm}
-          clearMessages={() => setFormMessage({})}
-          formDisabled={formDisabled}
-        >
-          {formMessage.message && (
-            <Box
-              className="form-message"
-              sx={{
-                "& .MuiChip-outlined": {
-                  border: "none",
-                },
-              }}
-            >
-              {formMessage.result === "success" ? (
-                <Chip
-                  icon={<PlaylistAddCheckIcon />}
-                  label={formMessage.message}
-                  color="success"
-                  variant="outlined"
-                  sx={{
-                    "& MuiChip-outlined": {
-                      border: "none",
-                    },
-                  }}
-                />
-              ) : formMessage.result === "error" ? (
-                <Chip
-                  icon={<ErrorOutlineIcon />}
-                  label={formMessage.message}
-                  color="error"
-                  variant="outlined"
-                />
-              ) : (
-                <Chip
-                  icon={<PlaylistRemoveIcon />}
-                  label={formMessage.message}
-                  color="warning"
-                  variant="outlined"
-                />
-              )}
-            </Box>
-          )}
-        </Form>
-      </Box>
-    </div>
+    <ThemeProvider theme={requestsFormTheme}>
+      <div className="container">
+        <Header title={eventInfo.name} subtitle={eventInfo.date}></Header>
+        <Box className="requests-view">
+          <Form
+            handleSubmit={SubmitForm}
+            clearMessages={() => setFormMessage({})}
+            formDisabled={formDisabled}
+          >
+            {formMessage.message && (
+              <Box
+                className="form-message"
+                sx={{
+                  "& .MuiChip-outlined": {
+                    border: "none",
+                  },
+                }}
+              >
+                {formMessage.result === "success" ? (
+                  <Chip
+                    icon={<PlaylistAddCheckIcon />}
+                    label={formMessage.message}
+                    color="success"
+                    variant="outlined"
+                    sx={{
+                      "& MuiChip-outlined": {
+                        border: "none",
+                      },
+                    }}
+                  />
+                ) : formMessage.result === "error" ? (
+                  <Chip
+                    icon={<ErrorOutlineIcon />}
+                    label={formMessage.message}
+                    color="error"
+                    variant="outlined"
+                  />
+                ) : (
+                  <Chip
+                    icon={<PlaylistRemoveIcon />}
+                    label={formMessage.message}
+                    color="warning"
+                    variant="outlined"
+                  />
+                )}
+              </Box>
+            )}
+          </Form>
+        </Box>
+      </div>
+    </ThemeProvider>
   );
 }
 
