@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useLoaderData, redirect } from "react-router-dom";
-import { getData } from "../api";
+import { getData } from "../../api";
 import Header from "../components/Header";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";

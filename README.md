@@ -1,6 +1,6 @@
-# Miscellaneous Form
+# Miscellaneous Event Forms
 
-Made for 'Jamin Productions
+Made by and for 'Jamin Productions
 
 ## Requests
 

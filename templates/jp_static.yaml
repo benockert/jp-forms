@@ -46,9 +46,15 @@ Resources:
           AllowedMethods:
             - GET
             - HEAD
+            - DELETE
+            - POST
+            - PUT
+            - OPTIONS
+            - PATCH
           TargetOriginId: private-s3-static-content-bucket
           ViewerProtocolPolicy: redirect-to-https
           CachePolicyId: b2884449-e4de-46a7-ac36-70bc7f1ddd6d
+          OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf # S3OriginCors
         ViewerCertificate:
           AcmCertificateArn: arn:aws:acm:us-east-1:783358359740:certificate/352b4616-b73c-4d83-acc4-0c8451383464
           MinimumProtocolVersion: TLSv1.2_2021

@@ -3,9 +3,13 @@ frameworkVersion: "3"
 
 custom:
   deploymentBucketName: "serverless-deployment-fghjkl389xc7a"
+  interactiveMediaTableName: "interactive-media-form-submission-${sls:stage}"
   requestsTableName: "song-requests-form-submission-${sls:stage}"
   eventsTableName: "jamin-productions-events-${sls:stage}"
   stackName: "song-requests-backend-stack-${sls:stage}"
+  staticBucketName: "static.jaminproductions.com"
+  staticBucketRegion: "us-east-1"
+  staticBucketArn: arn:aws:s3:::static.jaminproductions.com
 
 provider:
   name: aws
@@ -32,12 +36,21 @@ provider:
             - dynamodb:PutItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
+            - s3:PutObject
+            - s3:GetObject
           Resource:
             - Fn::GetAtt: [RequestsTable, Arn]
             - Fn::GetAtt: [EventsTable, Arn]
+            - Fn::GetAtt: [InteractiveMediaTable, Arn]
+            - ${self:custom.staticBucketArn}/*
   environment:
     REQUESTS_TABLE: ${self:custom.requestsTableName}
     EVENTS_TABLE: ${self:custom.eventsTableName}
+    INTERACTIVE_MEDIA_TABLE: ${self:custom.interactiveMediaTableName}
+    STATIC_CONTENT_BUCKET: ${self:custom.staticBucketName}
+    STATIC_BUCKET_REGION: ${self:custom.staticBucketRegion}
+    UPLOAD_URL_EXPIRATION_SECONDS: 60
+    APP_STAGE: ${sls:stage}
   httpApi:
     cors: true
 
@@ -47,9 +60,19 @@ functions:
     timeout: 10
     name: song-requests-form-handler-${sls:stage}
     description: "Handler for song request form submissions"
-    handler: index.handler
+    handler: Requests/index.handler
     events:
       - httpApi: "*"
+    # role:
+  handleInteractiveMediaSubmissions:
+    memorySize: 512
+    timeout: 10
+    name: interactive-media-form-handler-${sls:stage}
+    description: "Handler for media submissions"
+    handler: InteractiveMedia/index.handler
+    events:
+      - httpApi: "*"
+    # role:
 
 resources:
   Resources:
@@ -85,3 +108,27 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+    InteractiveMediaTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: event_name
+            AttributeType: S
+          - AttributeName: submission_timestamp
+            AttributeType: N
+        KeySchema:
+          - AttributeName: event_name
+            KeyType: HASH
+          - AttributeName: submission_timestamp
+            KeyType: RANGE
+        TableName: ${self:custom.interactiveMediaTableName}
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    # DynamoDbAccessRole:
+    #   Type: AWS::IAM::Role
+    #   Properties:
+    # S3PutPresignedRole:
+    #   Type: AWS::IAM::Role
+    #   Properties:

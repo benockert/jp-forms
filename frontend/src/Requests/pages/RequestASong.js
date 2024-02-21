@@ -3,7 +3,7 @@ import { useLoaderData } from "react-router-dom";
 import { useParams, redirect } from "react-router-dom";
 import { Form } from "../components/Form";
 import Header from "../components/Header";
-import { postData, getData } from "../api";
+import { postData, getData } from "../../api";
 import Chip from "@mui/material/Chip";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import PlaylistRemoveIcon from "@mui/icons-material/PlaylistRemove";

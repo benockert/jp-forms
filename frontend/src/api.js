@@ -5,6 +5,7 @@ const API_URL =
 
 export async function postData(path, data = {}) {
   try {
+    console.log(data);
     const response = await fetch(`${API_URL}${path}`, {
       method: "POST",
       headers: {
@@ -19,6 +20,20 @@ export async function postData(path, data = {}) {
       message: "An error has occurred. Please try again.",
     };
   }
+}
+
+export async function putImage(url, file) {
+  // const blob = new Blob([file]);
+  const headers = new Headers({
+    "Content-Type": "image/*",
+    "Content-Length": file.size,
+  });
+  const response = await fetch(url, {
+    method: "PUT",
+    headers,
+    body: file,
+  });
+  return { statusCode: response.status };
 }
 
 export async function getData(path) {

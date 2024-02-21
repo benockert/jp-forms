@@ -7,6 +7,7 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
+import { postData, putImage } from "../../api";
 
 // styled text field
 const TextInput = styled(TextField)(({ theme }) => ({}));
@@ -42,8 +43,9 @@ const FormDetails = {
   title: "Submit A Photo to the Class of 2024 Photo Mosaic",
 };
 
-const PhotoMosaicForm = () => {
+const PhotoMosaicForm = ({ eventId }) => {
   const [fileUploaded, setFileUploaded] = useState(false);
+  const [file, setFile] = useState();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -54,12 +56,26 @@ const PhotoMosaicForm = () => {
       email: data.get("message"),
       file: data.get("photo-upload"),
     });
+
+    postData(`media/${eventId}/photo_mosaic`, {
+      name: data.get("name"),
+      message: data.get("message"),
+      fileName: data.get("photo-upload").name,
+      // todo add photo type
+    }).then((data) => {
+      console.log(data);
+      if (data.result === "success") {
+        console.log("Got presigned url, uploading photo");
+        const result = putImage(data.presignedUrl, file);
+        console.log(result.statusCode);
+      }
+    });
   };
 
   const handleUpload = (event) => {
     event.preventDefault();
     setFileUploaded(true);
-    console.log(event.target.files[0]);
+    setFile(event.target.files[0]);
   };
 
   return (
