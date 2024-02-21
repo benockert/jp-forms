@@ -13,7 +13,8 @@ export async function postData(path, data = {}) {
       },
       body: new URLSearchParams(data),
     });
-    return response.json();
+    const json = response.json();
+    return json;
   } catch (error) {
     return {
       result: "error",

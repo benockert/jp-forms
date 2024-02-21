@@ -14,3 +14,6 @@ test-prod-build:
 
 add-new-event:
 	cd scripts && ./new_event.bat
+
+get-playlists:
+	curl --request GET --url https://api.spotify.com/v1/users/djbockert/playlists?limit=1 --header 'Authorization: Bearer {{auth token from ddb}}'

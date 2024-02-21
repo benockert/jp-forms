@@ -7,6 +7,7 @@ const {
 } = require("@aws-sdk/lib-dynamodb");
 const express = require("express");
 const serverless = require("serverless-http");
+var request = require("request");
 
 const app = express();
 const client = new DynamoDBClient();
@@ -146,6 +147,34 @@ app.post("/requests/:eventId", async function (req, res) {
         },
       };
 
+      // =========================================
+      // add to spotify
+      // todo: remove in favor of frontend sending
+      try {
+        request.post(
+          {
+            headers: { "content-type": "application/json" },
+            url: `https://t5cm4v4fol.execute-api.us-west-2.amazonaws.com/spotify/${eventId}/add_to_playlist`,
+            body: {
+              songTitle: songTitle,
+              artistName: artistName,
+            },
+            json: true,
+          },
+          (error, response, body) => {
+            console.log(
+              "TEMPORARY PLAYLIST SUBMISSION RESPONSE: (status)",
+              response?.statusCode,
+              "| message:",
+              body?.message
+            );
+          }
+        );
+      } catch (error) {
+        console.log("ERROR UPLOADING REQUEST TO PLAYLIST");
+      }
+      // =========================================
+
       console.log("Submitting Put request:", params);
       await dynamoDbClient.send(new PutCommand(params));
       res.status(200).json({
@@ -172,4 +201,3 @@ app.use((req, res, next) => {
 });
 
 module.exports.handler = serverless(app);
-

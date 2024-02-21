@@ -18,3 +18,8 @@ Various forms for accepting user submissions to interactive media applications
 - [x] Rewrite Form.js to make use of children props so SubmitRequest.js can handle the message compontents rather than passing info to Form.js
 - [x] Create favicon and logos
 - [ ] Route api gateway to custom domain
+- [ ] Add routing to functions in serverless template i.e. /requests goes to request handler
+- [ ] Standardize .json responses to always include status code and message
+- [ ] Move get-playlists from Makefile to scripts/
+- [ ] Replace `request` module with other option: https://stackoverflow.com/questions/6158933/how-is-an-http-post-request-made-in-node-js
+- [ ] Remove hardcoded api gateway endpoint (once first event finished and migrate to new domain)

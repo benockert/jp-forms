@@ -95,8 +95,18 @@ function RequestASong() {
       requestNotes,
     }).then((data) => {
       let message = data;
-
       if (data.result === "success") {
+        // upload to spotify playlist (don't await)
+        try {
+          postData(`spotify/${eventId}/add_to_playlist`, {
+            songTitle,
+            artistName,
+          });
+        } catch (error) {
+          console.log({ error });
+        }
+
+        // display submission message and determine remaining request count
         const count = requestCount + 1;
         setRequestCount(count);
         try {
